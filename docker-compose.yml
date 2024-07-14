@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: my-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=Admin123
+       
+  nginx:
+    build: ./nginx
+    container_name: my-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
