@@ -59,7 +59,7 @@ app.route("/api/users/:_id/exercises")
         res.json({username: username,
                   description: description,
                   duration: duration,
-                  date: DateTime.fromISO(dateString).toFormat('ccc LLL dd yyyy'),
+                  date: DateTime.fromISO(dateString).toFormat('ccc LLL dd yyyy').toString(),
                   _id: _id
         });
       });
@@ -96,18 +96,18 @@ app.route("/api/users/:_id/exercises")
          }
 
          if (from) {
-          response.from = DateTime.fromISO(from).toFormat('ccc LLL dd yyyy');
+          response.from = DateTime.fromISO(from).toFormat('ccc LLL dd yyyy').toString();
         }
 
         if (to) {
-          response.to = DateTime.fromISO(to).toFormat('ccc LLL dd yyyy');
+          response.to = DateTime.fromISO(to).toFormat('ccc LLL dd yyyy').toString();
         }
 
         response.count = logs.length;
         response.log = logs.map(entry => ({
              description: entry.description,
              duration: entry.duration,
-             date: DateTime.fromISO(entry.date).toFormat('ccc LLL dd yyyy')
+             date: DateTime.fromISO(entry.date).toFormat('ccc LLL dd yyyy').toString()
            }));
 
         res.json(response);
