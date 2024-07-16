@@ -65,14 +65,59 @@ app.route("/api/users/:_id/exercises")
       });
    });
 
-app.route("/api/users/:_id/logs")
+   app.route("/api/users/:_id/logs")
    .get((req, res) => {
-      const fromDateString = req.params.from;
-      const toDateString = req.params.to;
-      const limit = req.params.limit;
+     const { from, to, limit } = req.query;
+     const userId = req.params._id;
+ 
+     findById(exerciseModel, userId)
+       .then(user => {
+         if (!user) {
+           return res.status(404).json({ error: "User not found" });
+         }
+ 
+         let logs = user.log;
+ 
+         if (from) {
+           logs = logs.filter(log => new Date(log.date) >= new Date(from));
+         }
+ 
+         if (to) {
+           logs = logs.filter(log => new Date(log.date) <= new Date(to));
+         }
+ 
+         if (limit) {
+           logs = logs.slice(0, parseInt(limit, 10));
+         }
+ 
+         const response = {
+           _id: user._id,
+           username: user.username
+         }
 
-      
-   })
+         if (from) {
+          response.from = DateTime.fromISO(from).toFormat('ccc LLL dd yyyy');
+        }
+
+        if (to) {
+          response.to = DateTime.fromISO(to).toFormat('ccc LLL dd yyyy');
+        }
+
+        response.count = logs.length;
+        response.log = logs.map(entry => ({
+             description: entry.description,
+             duration: entry.duration,
+             date: DateTime.fromISO(entry.date).toFormat('ccc LLL dd yyyy')
+           }));
+
+        res.json(response);
+       })
+       .catch(err => {
+         console.error('Error fetching user logs:', err);
+         res.status(500).json({ message: 'Server error', error: err });
+       });
+   });
+ 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
